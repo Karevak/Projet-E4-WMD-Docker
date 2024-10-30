@@ -331,10 +331,14 @@ export DOCKER_USERNAME=votre-username
 docker-compose up --build -d
 
 ```
+![image](https://github.com/user-attachments/assets/0211f812-e527-4f78-b604-6980d8827975)
+
 
 
 
 4. Publication des images sur Docker Hub
+
+![image](https://github.com/user-attachments/assets/2604e2f5-0ab7-4cdf-8c33-969155fedd82)
 
 ```bash
 
@@ -346,6 +350,7 @@ docker-compose push
 
 ## Optimisation des images
 
+![image](https://github.com/user-attachments/assets/db8a63ed-dcbb-4766-bfb5-704ce3c818b9)
 
 
 Pour réduire la taille des images, nous utilisons les techniques suivantes :
