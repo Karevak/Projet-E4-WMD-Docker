@@ -79,24 +79,26 @@ graph TD
    - Application accessible directement sans reverse proxy
 
    - [Lien GitHub](https://github.com/app-generator/docs-django-grafana)
+   - [Lien Image Docker Hub](https://hub.docker.com/repository/docker/zafrann/docs-django-grafana/general)
 
 
 
 2. docs-django-react (Port: 9001:8000)
 
    - [Lien GitHub](https://github.com/app-generator/docs-django-react)
-
+   - [Lien Image Docker Hub](https://hub.docker.com/repository/docker/zafrann/docs-django-react/general)
 
 
 3. ecommerce-flask-stripe (Port: 9002:5000)
 
    - [Lien GitHub](https://github.com/app-generator/ecommerce-flask-stripe)
-
+   - [Lien Image Docker Hub](https://hub.docker.com/repository/docker/zafrann/ecommerce-flask-stripe/general)
 
 
 4. flask-soft-ui-design (Port: 9003:5000)
 
    - [Lien GitHub](https://github.com/app-generator/flask-soft-ui-design)
+   - [Lien Image Docker Hub](https://hub.docker.com/repository/docker/zafrann/flask-soft-ui-design/general)
 
    - Configuré avec 5 replicas pour la haute disponibilité
 
@@ -105,6 +107,8 @@ graph TD
 5. rocket-ecommerce (Port: 9004:8000)
 
    - [Lien GitHub](https://github.com/app-generator/rocket-ecommerce)
+   - [Lien Image Docker Hub](https://hub.docker.com/repository/docker/zafrann/rocket-ecommerce/general)
+
 
 
 
@@ -122,7 +126,7 @@ version: '3.8'
 
 services:
 
-  reverse-proxy:
+  nginx:
 
     image: nginx:alpine
 
@@ -132,23 +136,19 @@ services:
 
     volumes:
 
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
     depends_on:
 
-      - docs-django-react
+      - django-grafana
 
-      - ecommerce-flask
+    networks:
 
-      - flask-soft-ui
-
-      - rocket-ecommerce
+      - app-network
 
 
 
-  docs-django-grafana:
-
-    image: ${DOCKER_USERNAME}/docs-django-grafana:latest
+  django-grafana:
 
     build: 
 
@@ -156,77 +156,76 @@ services:
 
       dockerfile: Dockerfile
 
-    ports:
-
-      - "9005:8000"
-
-
-
-  docs-django-react:
-
-    image: ${DOCKER_USERNAME}/docs-django-react:latest
-
-    build:
-
-      context: ./docs-django-react
-
-      dockerfile: Dockerfile
-
-    expose:
-
-      - "8000"
-
-
-
-  ecommerce-flask:
-
-    image: ${DOCKER_USERNAME}/ecommerce-flask-stripe:latest
-
-    build:
-
-      context: ./ecommerce-flask-stripe
-
-      dockerfile: Dockerfile
-
-    expose:
-
-      - "5000"
-
-
-
-  flask-soft-ui:
-
-    image: ${DOCKER_USERNAME}/flask-soft-ui-design:latest
-
-    build:
-
-      context: ./flask-soft-ui-design
-
-      dockerfile: Dockerfile
-
     deploy:
 
       replicas: 5
 
-    expose:
+      update_config:
 
-      - "5000"
+        parallelism: 2
+
+        delay: 10s
+
+      restart_policy:
+
+        condition: on-failure
+
+    networks:
+
+      - app-network
+
+
+
+  django-react:
+
+    build: ./docs-django-react
+
+    networks:
+
+      - app-network
+
+
+
+  flask-stripe:
+
+    build: ./ecommerce-flask-stripe
+
+    networks:
+
+      - app-network
+
+
+
+  flask-softui:
+
+    build: ./flask-soft-ui-design
+
+    networks:
+
+      - app-network
 
 
 
   rocket-ecommerce:
 
-    image: ${DOCKER_USERNAME}/rocket-ecommerce:latest
+    build: ./rocket-ecommerce
 
-    build:
+    ports:
 
-      context: ./rocket-ecommerce
+      - "8080:8080"  # Accès direct sans reverse proxy
 
-      dockerfile: Dockerfile
+    networks:
 
-    expose:
+      - app-network
 
-      - "8000"
+
+
+networks:
+
+  app-network:
+
+    driver: bridge
+
 
 ```
 
@@ -306,9 +305,9 @@ http {
 
 ```bash
 
-git clone <repository-url>
+git clone https://github.com/Karevak/Projet-E4-WMD-Docker.git
 
-cd <repository-name>
+cd Projet-E4-WMD-Docker
 
 ```
 
