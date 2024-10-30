@@ -1,0 +1,54 @@
+version: '3.8'
+
+
+
+services:
+
+  django-grafana:
+
+    build: ./docs-django-grafana
+
+    ports:
+
+      - "8001:8000"
+
+  
+
+  django-react:
+
+    build: ./docs-django-react
+
+    ports:
+
+      - "8002:8000"
+
+    
+
+  ecommerce-flask-stripe:
+
+    build: ./ecommerce-flask-stripe
+
+    ports:
+
+      - "5001:5000"
+
+
+
+  flask-soft-ui:
+
+    build: ./flask-soft-ui-design
+
+    ports:
+
+      - "5002:5000"
+
+
+
+  rocket-ecommerce:
+
+    build: ./rocket-ecommerce
+
+    ports:
+
+      - "5003:5000"
+
