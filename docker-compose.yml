@@ -4,43 +4,83 @@ version: '3.8'
 
 services:
 
-  django-grafana:
+  nginx:
 
-    build: ./docs-django-grafana
+    image: nginx:alpine
 
     ports:
 
-      - "8001:8000"
+      - "80:80"
 
-  
+    volumes:
+
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+    depends_on:
+
+      - django-grafana
+
+    networks:
+
+      - app-network
+
+
+
+  django-grafana:
+
+    build: 
+
+      context: ./docs-django-grafana
+
+      dockerfile: Dockerfile
+
+    deploy:
+
+      replicas: 5
+
+      update_config:
+
+        parallelism: 2
+
+        delay: 10s
+
+      restart_policy:
+
+        condition: on-failure
+
+    networks:
+
+      - app-network
+
+
 
   django-react:
 
     build: ./docs-django-react
 
-    ports:
+    networks:
 
-      - "8002:8000"
+      - app-network
 
-    
 
-  ecommerce-flask-stripe:
+
+  flask-stripe:
 
     build: ./ecommerce-flask-stripe
 
-    ports:
+    networks:
 
-      - "5001:5000"
+      - app-network
 
 
 
-  flask-soft-ui:
+  flask-softui:
 
     build: ./flask-soft-ui-design
 
-    ports:
+    networks:
 
-      - "5002:5000"
+      - app-network
 
 
 
@@ -50,5 +90,16 @@ services:
 
     ports:
 
-      - "5003:5000"
+      - "8080:8080"  # Accès direct sans reverse proxy
 
+    networks:
+
+      - app-network
+
+
+
+networks:
+
+  app-network:
+
+    driver: bridge
